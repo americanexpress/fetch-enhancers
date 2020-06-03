@@ -254,9 +254,9 @@ Please feel free to open pull requests and see [CONTRIBUTING.md](./CONTRIBUTING.
 ## 🗝️ License
 
 Any contributions made under this project will be governed by the [Apache License
-2.0](./LICENSE.txt).
+2.0](./LICENSE).
 
 ## 🗣️ Code of Conduct
 
-This project adheres to the [American Express Community Guidelines](./CONTRIBUTING.md).
+This project adheres to the [American Express Community Guidelines](./CODE_OF_CONDUCT.md).
 By participating, you are expected to honor these guidelines.
