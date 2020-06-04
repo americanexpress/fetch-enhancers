@@ -36,12 +36,12 @@ Each fetch enhancer follows the same pattern:
 * Return a function which takes a fetch client as the sole argument  `fetchEnhancer(configuration)(fetch)`
 
 
-#### createTimeoutFetch [Server & Browser]
+### createTimeoutFetch [Server & Browser]
 
 `createTimeoutFetch` makes use of the [AbortController](https://developer.mozilla.org/en-US/docs/Web/API/AbortController) to abort requests which exceed the given time limit.
 
 
-##### Configuring
+#### Configuring
 
 `createTimeoutFetch` takes a single argument which sets the default timeout.
 
@@ -56,7 +56,7 @@ default timeout value to be overridden for a single request.
 const slowRequest = timeoutFetch('https://example.com/some-slow-api', { timeout: 10e3 });
 ```
 
-##### Example
+#### Example
 
 ```js
 import { createTimeoutFetch } from '@americanexpress/fetch-enhancers';
@@ -75,18 +75,18 @@ request.then((response) => response.json())
 const fastRequest = timeoutFetch('https://example.com/fast', { timeout: 1e3 });
 ```
 
-#### createBrowserLikeFetch [Server only]
+### createBrowserLikeFetch [Server only]
 
 `createBrowserLikeFetch` is for use on the server only. It enables the forwarding of
 cookies and headers from the request made to the host server to trusted outbound requests made during
 a server side render. Cookies which are returned are stored for the life of the host servers requests
 allowing those cookies to be included, when valid, on subsequent requests.
 
-##### Configuring
+#### Configuring
 
 `createBrowserLikeFetch` accepts the following named arguments:
 
-###### `headers`
+##### `headers`
 
 Object containing any headers to be included on fetch requests.
 
@@ -106,16 +106,16 @@ const headers = parseHeaders(req);
 const fetchWithRequestHeaders = createBrowserLikeFetch({
   headers,
   hostname: req.hostname,
-  setCookie: res.cookie,
+  res, // Express response
   trustedDomains: [/example\.com/],
 })(mockFetch);
 ```
 
-###### `hostname`
+##### `hostname`
 
 Hostname which should be derived from the Host HTTP header. Used to determine if set `setCookie` will be called. If using Express this can be retrieved from the [`req`](https://expressjs.com/en/4x/api.html#req.hostname) object.
 
-###### `res`
+##### `res`
 
 Typically this would be an [Express response](https://expressjs.com/en/4x/api.html#res) object. `createBrowserLikeFetch`
 makes use of the [cookie](https://expressjs.com/en/4x/api.html#res.cookie) function to set cookies on the response.
@@ -125,9 +125,9 @@ If you wish to provide your own function to set cookies, use [setCookie](#set-co
 > `res.cookie()` function provided by express requires [`this`](https://github.com/expressjs/express/blob/master/lib/response.js#L833) to be set
 > to the context of the express middleware.
 
-###### `setCookie`
+##### `setCookie`
 
-This takes precedence over `res.cookie`.
+This takes precedence over `res.cookie` provided in the `res` argument.
 
 `setCookie(name, value [, options])`
 
@@ -154,7 +154,7 @@ const fetchWithRequestHeaders = createBrowserLikeFetch({
 })(mockFetch);
 ```
 
-###### `trustedDomains`
+##### `trustedDomains`
 
 A list of [regular expressions](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions) used to test the path given to fetch when making a request.
 If the test is successful the enhanced fetch will include provided cookies.
@@ -163,7 +163,7 @@ If the test is successful the enhanced fetch will include provided cookies.
 const trustedDomains = [/api\.example\.com/, /another\.example\.com/];
 ```
 
-##### Example
+#### Example
 
 ```js
 const parseHeaders = (req) => ({
@@ -179,7 +179,7 @@ const parseHeaders = (req) => ({
 const fetchWithRequestHeaders = createBrowserLikeFetch({
   headers: parseHeaders(req),
   hostname: req.hostname,
-  setCookie: res.cookie,
+  res, // Express response
   trustedDomains: [/example\.com/],
 })(mockFetch);
 
@@ -188,7 +188,7 @@ fetchWithRequestHeaders('https://example.com', {
 });
 ```
 
-### Composing fetch enhancers
+## Composing fetch enhancers
 
 You can chain together multiple enhancers to build a specific enhanced fetch client
 
@@ -223,7 +223,7 @@ request.then((response) => response.json())
   });
 ```
 
-### Creating your own fetch enhancer
+## Creating your own fetch enhancer
 
 Each enhancer must return a function which accepts `fetch` as a single argument.
 
