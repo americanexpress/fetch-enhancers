@@ -13,7 +13,7 @@ jobs:
       - name: Setup master branch for commitlint
         uses: actions/checkout@v2
         # https://github.com/conventional-changelog/commitlint/issues/6
-        run: git remote set-branches origin master && git fetch
+      - run: git remote set-branches origin master && git fetch
       - name: Setup node
         uses: actions/setup-node@v1
         with:
