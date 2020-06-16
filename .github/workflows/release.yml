@@ -34,3 +34,4 @@ jobs:
           GIT_COMMITTER_NAME: ${{ secrets.GIT_COMMITTER_NAME }}
           GITHUB_TOKEN: ${{ secrets.PA_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npx semantic-release
