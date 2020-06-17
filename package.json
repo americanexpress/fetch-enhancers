@@ -1,6 +1,6 @@
 {
   "name": "@americanexpress/fetch-enhancers",
-  "version": "1.0.0-rc1",
+  "version": "1.0.0",
   "description": "Set of enhancers to extend fetch",
   "main": "lib/fetch-enhancers.js",
   "browser": "es/fetch-enhancers.js",
@@ -84,9 +84,9 @@
       "@semantic-release/commit-analyzer",
       "@semantic-release/release-notes-generator",
       "@semantic-release/changelog",
+      "@semantic-release/npm",
       "@semantic-release/git",
-      "@semantic-release/github",
-      "@semantic-release/npm"
+      "@semantic-release/github"
     ],
     "branch": "master"
   }
