@@ -38,6 +38,10 @@ Each fetch enhancer follows the same pattern:
 
 ### createTimeoutFetch [Server & Browser]
 
+```js
+import { createTimeoutFetch } from '@americanexpress/fetch-enhancers';
+```
+
 `createTimeoutFetch` makes use of the [AbortController](https://developer.mozilla.org/en-US/docs/Web/API/AbortController) to abort requests which exceed the given time limit.
 
 
@@ -76,6 +80,10 @@ const fastRequest = timeoutFetch('https://example.com/fast', { timeout: 1e3 });
 ```
 
 ### createBrowserLikeFetch [Server only]
+
+```js
+import { createBrowserLikeFetch } from '@americanexpress/fetch-enhancers';
+```
 
 `createBrowserLikeFetch` is for use on the server only. It enables the forwarding of
 cookies and headers from the request made to the host server to trusted outbound requests made during
