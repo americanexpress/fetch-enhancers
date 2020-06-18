@@ -11,17 +11,17 @@ Want to get paid for your contributions to `@americanexpress/fetch-enhancers`?
 
 ## 📖 Table of Contents
 
-* [Usage](#-useage)
-* [Contributing](#-contributing)
+* [Usage](#usage)
+* [Contributing](#contributing)
 
 ## 🤹‍ Usage
 
-* [Installation](#-installation)
-* [Fetch Enhancers](#-fetch-enhancers)
-* [createTimeoutFetch](#-createTimeoutFetch)
-* [createBrowserLikeFetch](#-createBrowserLikeFetch)
-* [Composing fetch enhancers](#-composing-fetch-enhancers)
-* [Creating your own fetch enhancer](#-creating-your-own-fetch-enhancer)
+* [Installation](#installation)
+* [Fetch Enhancers](#fetch-enhancers)
+* [createTimeoutFetch](#createtimeoutfetch-server--browser)
+* [createBrowserLikeFetch](#createbrowserlikefetch-server-only)
+* [Composing fetch enhancers](#composing-fetch-enhancers)
+* [Creating your own fetch enhancer](#creating-your-own-fetch-enhancer)
 
 ### Installation
 
