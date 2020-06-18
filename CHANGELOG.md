@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/americanexpress/fetch-enhancers/compare/v1.0.0...v1.0.1) (2020-06-18)
+
+
+### Bug Fixes
+
+* **package-json/version:** 1.0.0 [skip ci] ([#7](https://github.com/americanexpress/fetch-enhancers/issues/7)) ([8edb7b8](https://github.com/americanexpress/fetch-enhancers/commit/8edb7b877abca2e4c107609fa54fa9d26d38e7fe))
+
 # 1.0.0 (2020-06-17)
 
 
