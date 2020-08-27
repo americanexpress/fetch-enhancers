@@ -46,7 +46,7 @@ describe('createCookiePassingFetch', () => {
     expect(setCookie.mock.calls[0][2].maxAge).toEqual(3600000);
   });
 
-  it('correctly sets max-age', async () => {
+  it('does not add missing propterties', async () => {
     const mockFetch = jest.fn(() => Promise.resolve({
       headers: new Headers({
         'set-cookie': [
@@ -65,7 +65,7 @@ describe('createCookiePassingFetch', () => {
       credentials: 'include',
     });
 
-    // express sets cookies max age in milliseconds rather than seconds
+    // if null values are not removed this will fail
     expect(setCookie.mock.calls[0][2].maxAge).toBe(undefined);
   });
 
