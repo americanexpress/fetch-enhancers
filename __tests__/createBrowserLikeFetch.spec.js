@@ -46,6 +46,29 @@ describe('createCookiePassingFetch', () => {
     expect(setCookie.mock.calls[0][2].maxAge).toEqual(3600000);
   });
 
+  it('correctly sets max-age', async () => {
+    const mockFetch = jest.fn(() => Promise.resolve({
+      headers: new Headers({
+        'set-cookie': [
+          'sessionId=1234rlakjhf; Domain=example.com; Path=/path/; HttpOnly;',
+        ],
+      }),
+    }));
+    const hostname = 'api.example.com';
+    const setCookie = jest.fn();
+    const fetchWithRequestHeaders = createBrowserLikeFetch({
+      hostname,
+      setCookie,
+    })(mockFetch);
+
+    await fetchWithRequestHeaders('https://example.com', {
+      credentials: 'include',
+    });
+
+    // express sets cookies max age in milliseconds rather than seconds
+    expect(setCookie.mock.calls[0][2].maxAge).toBe(undefined);
+  });
+
   it('does not call setCookie with mismatching domain on response', async () => {
     const mockFetch = jest.fn(() => Promise.resolve({
       headers: new Headers({

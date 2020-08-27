@@ -62,9 +62,12 @@ function createBrowserLikeFetch({
               const value = decodeURIComponent(valueRaw);
               const cookieDomain = cookieOptions.domain;
               if (cookieDomain && `.${cookieDomain}`.endsWith(`.${hostname.split('.').slice(-2).join('.')}`)) {
+                // remove null values from cookieOptions
+                const filteredOptions = Object.fromEntries(Object.entries(cookieOptions)
+                  .filter(([, propertyValue]) => propertyValue != null));
                 const expressCookieOptions = {
-                  ...cookieOptions,
-                  ...cookieOptions.maxAge ? { maxAge: cookieOptions.maxAge * 1e3 } : undefined,
+                  ...filteredOptions,
+                  ...filteredOptions.maxAge ? { maxAge: cookieOptions.maxAge * 1e3 } : undefined,
                 };
                 res.cookie(key, value, expressCookieOptions);
               }
