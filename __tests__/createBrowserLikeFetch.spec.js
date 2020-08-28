@@ -46,7 +46,7 @@ describe('createCookiePassingFetch', () => {
     expect(setCookie.mock.calls[0][2].maxAge).toEqual(3600000);
   });
 
-  it('does not add missing propterties', async () => {
+  it('does not add missing properties', async () => {
     const mockFetch = jest.fn(() => Promise.resolve({
       headers: new Headers({
         'set-cookie': [
