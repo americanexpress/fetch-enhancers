@@ -1,3 +1,10 @@
+## [1.0.2](https://github.com/americanexpress/fetch-enhancers/compare/v1.0.1...v1.0.2) (2020-08-28)
+
+
+### Bug Fixes
+
+* **createBrowserLikeFetch:** remove null cookie options ([#9](https://github.com/americanexpress/fetch-enhancers/issues/9)) ([47d49df](https://github.com/americanexpress/fetch-enhancers/commit/47d49dfd3d11487bed537906302864a5079000dc))
+
 ## [1.0.1](https://github.com/americanexpress/fetch-enhancers/compare/v1.0.0...v1.0.1) (2020-06-18)
 
 

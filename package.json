@@ -1,6 +1,6 @@
 {
   "name": "@americanexpress/fetch-enhancers",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Set of enhancers to extend fetch",
   "main": "lib/fetch-enhancers.js",
   "browser": "es/fetch-enhancers.js",
