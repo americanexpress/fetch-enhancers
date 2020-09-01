@@ -62,9 +62,18 @@ function createBrowserLikeFetch({
               const value = decodeURIComponent(valueRaw);
               const cookieDomain = cookieOptions.domain;
               if (cookieDomain && `.${cookieDomain}`.endsWith(`.${hostname.split('.').slice(-2).join('.')}`)) {
-                // remove null values from cookieOptions
                 const filteredOptions = Object.fromEntries(Object.entries(cookieOptions)
-                  .filter(([, propertyValue]) => propertyValue != null));
+                  .filter(([propertyKey, propertyValue]) => {
+                    // remove expires set to Infinity by default
+                    if (propertyKey === 'expires' && propertyValue === 'Infinity') {
+                      return false;
+                    }
+                    // remove null values from cookieOptions
+                    if (propertyValue != null) {
+                      return true;
+                    }
+                    return false;
+                  }));
                 const expressCookieOptions = {
                   ...filteredOptions,
                   ...filteredOptions.maxAge ? { maxAge: cookieOptions.maxAge * 1e3 } : undefined,
