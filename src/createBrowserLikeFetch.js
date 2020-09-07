@@ -57,26 +57,14 @@ function createBrowserLikeFetch({
 
           cookieStrings.forEach((cookieString) => {
             const cookie = parse(cookieString);
-            const { key, value: valueRaw, ...cookieOptions } = cookie;
+            const { key, value: valueRaw, ...cookieOptions } = cookie.toJSON();
             try {
               const value = decodeURIComponent(valueRaw);
               const cookieDomain = cookieOptions.domain;
               if (cookieDomain && `.${cookieDomain}`.endsWith(`.${hostname.split('.').slice(-2).join('.')}`)) {
-                const filteredOptions = Object.fromEntries(Object.entries(cookieOptions)
-                  .filter(([propertyKey, propertyValue]) => {
-                    // remove expires set to Infinity by default
-                    if (propertyKey === 'expires' && propertyValue === 'Infinity') {
-                      return false;
-                    }
-                    // remove null values from cookieOptions
-                    if (propertyValue != null) {
-                      return true;
-                    }
-                    return false;
-                  }));
                 const expressCookieOptions = {
-                  ...filteredOptions,
-                  ...filteredOptions.maxAge ? { maxAge: cookieOptions.maxAge * 1e3 } : undefined,
+                  ...cookieOptions,
+                  ...cookieOptions.maxAge ? { maxAge: cookieOptions.maxAge * 1e3 } : undefined,
                 };
                 res.cookie(key, value, expressCookieOptions);
               }
