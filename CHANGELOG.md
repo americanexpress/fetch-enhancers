@@ -1,3 +1,10 @@
+## [1.0.3](https://github.com/americanexpress/fetch-enhancers/compare/v1.0.2...v1.0.3) (2020-09-08)
+
+
+### Bug Fixes
+
+* **createBrowserLikeFetch:** expires defaults to undefined ([#10](https://github.com/americanexpress/fetch-enhancers/issues/10)) ([4c82621](https://github.com/americanexpress/fetch-enhancers/commit/4c8262192227998627b208c9043d7261d48b33b4))
+
 ## [1.0.2](https://github.com/americanexpress/fetch-enhancers/compare/v1.0.1...v1.0.2) (2020-08-28)
 
 
