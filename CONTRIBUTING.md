@@ -39,7 +39,7 @@ To auto fix eslint rule failures that are autofixable run `npm run test:lint -- 
 
 ### Opening the PR
 
-* [Fork the Fetch Enhancers repository](https://github.com/americanexpress/fetch-enhancers), open a PR to `master`, and follow the guidelines outlined in this document.
+* [Fork the Fetch Enhancers repository](https://github.com/americanexpress/fetch-enhancers), open a PR to `main`, and follow the guidelines outlined in this document.
 
 ### Pull Request Guidelines
 
