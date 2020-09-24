@@ -4,6 +4,8 @@
 
 > A library of middleware for enhancing [Fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API).
 
+![Health Check](https://github.com/americanexpress/fetch-enhancers/workflows/Health%20Check/badge.svg)
+
 ## 👩‍💻 Hiring 👨‍💻
 
 Want to get paid for your contributions to `@americanexpress/fetch-enhancers`?
