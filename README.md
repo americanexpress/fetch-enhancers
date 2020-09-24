@@ -1,8 +1,10 @@
 <h1 align="center">
-  <img src='https://github.com/americanexpress/fetch-enhancers/blob/master/fetch-enhancers.png' alt="Fetch Enhancers - One Amex" width='50%'/>
+  <img src='https://github.com/americanexpress/fetch-enhancers/blob/main/fetch-enhancers.png' alt="Fetch Enhancers - One Amex" width='50%'/>
 </h1>
 
 > A library of middleware for enhancing [Fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API).
+
+![Health Check](https://github.com/americanexpress/fetch-enhancers/workflows/Health%20Check/badge.svg)
 
 ## 👩‍💻 Hiring 👨‍💻
 
@@ -130,7 +132,7 @@ makes use of the [cookie](https://expressjs.com/en/4x/api.html#res.cookie) funct
 
 If you wish to provide your own function to set cookies, use [setCookie](#set-cookie).
 
-> `res.cookie()` function provided by express requires [`this`](https://github.com/expressjs/express/blob/master/lib/response.js#L833) to be set
+> `res.cookie()` function provided by express requires [`this`](https://github.com/expressjs/express/blob/main/lib/response.js#L833) to be set
 > to the context of the express middleware.
 
 ##### `setCookie`
