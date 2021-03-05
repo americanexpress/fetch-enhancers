@@ -115,7 +115,31 @@ describe('createCookiePassingFetch', () => {
     expect(setCookie).not.toHaveBeenCalled();
   });
 
-  it('sends cookies from headers to fetch requests when credentials included and path is a trustedDomain', () => {
+  it('sends cookies from headers to fetch requests when credentials are included and URL is trusted', () => {
+    const mockFetch = jest.fn(() => Promise.resolve({}));
+    const headers = {
+      cookie: 'sessionid=123456',
+    };
+    const trustedURLs = [/^https:\/\/safe-to-send\.example\.net\/api\/.+$/];
+    const enhancedFetch = createBrowserLikeFetch({ trustedURLs, headers })(mockFetch);
+
+    enhancedFetch('https://safe-to-send.example.net/api/some-resource', {
+      credentials: 'include',
+      headers: {
+        'Custom-Header': 'some header for this request',
+      },
+    });
+
+    expect(mockFetch).toHaveBeenCalledWith('https://safe-to-send.example.net/api/some-resource', {
+      credentials: 'include',
+      headers: {
+        cookie: 'sessionid=123456',
+        'Custom-Header': 'some header for this request',
+      },
+    });
+  });
+
+  it('sends cookies from headers to fetch requests when credentials are included and URL is trusted via the deprecated trustedDomains option', () => {
     const mockFetch = jest.fn(() => Promise.resolve({}));
     const headers = {
       cookie: 'sessionid=123456',
@@ -139,13 +163,13 @@ describe('createCookiePassingFetch', () => {
     });
   });
 
-  it('does not send cookies from headers to fetch requests when credentials included and path is not a trustedDomain', () => {
+  it('does not send cookies from headers to fetch requests when credentials are included and URL is not trusted', () => {
     const mockFetch = jest.fn(() => Promise.resolve({}));
     const headers = {
       cookie: 'sessionid=123456',
     };
-    const trustedDomains = [/^https:\/\/safe-to-send\.example\.net\/api\/.+$/];
-    const enhancedFetch = createBrowserLikeFetch({ trustedDomains, headers })(mockFetch);
+    const trustedURLs = [/^https:\/\/safe-to-send\.example\.net\/api\/.+$/];
+    const enhancedFetch = createBrowserLikeFetch({ trustedURLs, headers })(mockFetch);
 
     enhancedFetch('https://not-safe-to-send.example.net/api/some-resource', {
       credentials: 'include',
@@ -162,13 +186,13 @@ describe('createCookiePassingFetch', () => {
     });
   });
 
-  it('does not send cookies from headers to fetch requests when credentials not included but path is a trustedDomain', () => {
+  it('does not send cookies from headers to fetch requests when credentials are not included but URL is trusted', () => {
     const mockFetch = jest.fn(() => Promise.resolve({}));
     const headers = {
       cookie: 'sessionid=123456',
     };
-    const trustedDomains = [/^https:\/\/safe-to-send\.example\.com\/api\/.+$/];
-    const enhancedFetch = createBrowserLikeFetch({ trustedDomains, headers })(mockFetch);
+    const trustedURLs = [/^https:\/\/safe-to-send\.example\.com\/api\/.+$/];
+    const enhancedFetch = createBrowserLikeFetch({ trustedURLs, headers })(mockFetch);
 
     enhancedFetch('https://safe-to-send.example.com/api/some-resource', {
       headers: {
@@ -184,8 +208,8 @@ describe('createCookiePassingFetch', () => {
   });
 
   it('sends along cookies that were set by a previous request', async () => {
-    const mockFetch = jest.fn((path) => {
-      switch (path) {
+    const mockFetch = jest.fn((url) => {
+      switch (url) {
         case 'https://example.com/api/a': {
           const headers = new Headers({
             'set-cookie': [
@@ -205,10 +229,10 @@ describe('createCookiePassingFetch', () => {
       cookie: 'someid=abc',
     };
     const setCookie = jest.fn();
-    const trustedDomains = [/.*/];
+    const trustedURLs = [/.*/];
 
     const enhancedFetch = createBrowserLikeFetch({
-      hostname, headers, trustedDomains, setCookie,
+      hostname, headers, trustedURLs, setCookie,
     })(mockFetch);
     await enhancedFetch('https://example.com/api/a', { credentials: 'include' });
     await enhancedFetch('https://example.com/api/b', { credentials: 'include' });
@@ -260,8 +284,8 @@ describe('createCookiePassingFetch', () => {
   it('does not send an empty string cookie header', async () => {
     const mockFetch = jest.fn(() => Promise.resolve({ headers: new Headers({}) }));
     const hostname = 'example.com';
-    const trustedDomains = [/.*/];
-    const enhancedFetch = createBrowserLikeFetch({ hostname, trustedDomains })(mockFetch);
+    const trustedURLs = [/.*/];
+    const enhancedFetch = createBrowserLikeFetch({ hostname, trustedURLs })(mockFetch);
 
     await enhancedFetch('/', { credentials: 'include' });
     expect(mockFetch).toHaveBeenCalledWith('/', {
@@ -310,7 +334,7 @@ describe('createCookiePassingFetch', () => {
     expect(mockFetch).toHaveBeenCalledWith('https://example.org/api/some-resource', {});
   });
 
-  it('does not add headers to fetch when not a trustedDomain', async () => {
+  it('does not add headers to fetch when the URL is not trusted', async () => {
     const mockFetch = jest.fn(() => Promise.resolve({
       headers: new Headers({
         'set-cookie': [
@@ -322,10 +346,10 @@ describe('createCookiePassingFetch', () => {
     const headers = {
       'one-custom-header': 'i-did-not-make-it',
     };
-    const trustedDomains = [];
+    const trustedURLs = [];
 
     const enhancedFetch = createBrowserLikeFetch({
-      headers, trustedDomains, hostname,
+      headers, trustedURLs, hostname,
     })(mockFetch);
 
     await enhancedFetch('not-trusted.example.com', { credentials: 'include' });
@@ -334,7 +358,7 @@ describe('createCookiePassingFetch', () => {
     });
   });
 
-  it('adds all headers to fetch when a trustedDomain', async () => {
+  it('adds all headers to fetch when the URL is trusted', async () => {
     const mockFetch = jest.fn(() => Promise.resolve({
       headers: new Headers({
         'set-cookie': [
@@ -346,9 +370,9 @@ describe('createCookiePassingFetch', () => {
     const headers = {
       'one-custom-header': 'hello-there',
     };
-    const trustedDomains = [/.*/];
+    const trustedURLs = [/.*/];
     const enhancedFetch = createBrowserLikeFetch({
-      headers, trustedDomains, hostname,
+      headers, trustedURLs, hostname,
     })(mockFetch);
 
     await enhancedFetch('some.example.com', { credentials: 'include' });
@@ -412,5 +436,16 @@ describe('createCookiePassingFetch', () => {
     expect(setCookie.mock.calls[0][2].domain).toEqual('example.com');
     expect(setCookie.mock.calls[0][2].httpOnly).toBeTruthy();
     expect(setCookie.mock.calls[0][2].secure).toBeTruthy();
+  });
+
+  it('warns when the deprecated trustedDomains option is used', () => {
+    jest.spyOn(console, 'warn');
+    console.warn.mockClear();
+
+    const trustedDomains = [/.+/];
+    createBrowserLikeFetch({ trustedDomains });
+
+    expect(console.warn).toHaveBeenCalledTimes(1);
+    expect(console.warn.mock.calls[0][0]).toBe('createBrowserLikeFetch: trustedDomains option is deprecated in favor of trustedURLs, adding entries to trustedURLs');
   });
 });

@@ -18,7 +18,7 @@ const { CookieJar, parse } = require('tough-cookie');
 const deepMerge = require('./deepMergeObjects');
 
 const constructCookieString = (...fragments) => fragments.filter((fragment) => fragment).join('; ');
-const isTrustedPath = (path, trustedRegExp) => trustedRegExp.some((t) => new RegExp(t).test(path));
+const isTrustedURL = (path, trustedRegExp) => trustedRegExp.some((t) => new RegExp(t).test(path));
 
 const noop = () => 0;
 
@@ -27,21 +27,33 @@ function createBrowserLikeFetch({
   hostname,
   res = { cookie: noop },
   setCookie,
-  trustedDomains = [],
+  trustedURLs = [],
+  trustedDomains,
 } = {}) {
   // do not destructure `cookie`. Express req.cookie requires `this` to equal
   // context of express middleware.
   // https://github.com/expressjs/express/blob/master/lib/response.js#L833
   res.cookie = setCookie || res.cookie;
 
+  // trustedDomains is deprecated for matching URLs instead of just domains
+  // remove in the next major/breaking version
+  if (trustedDomains) {
+    // notify the user of the deprecation
+    // eslint-disable-next-line no-console
+    console.warn('createBrowserLikeFetch: trustedDomains option is deprecated in favor of trustedURLs, adding entries to trustedURLs');
+    // avoid mutation of the parameter (ex: `trustedURLs.push(...trustedDomains)`)
+    // eslint-disable-next-line no-param-reassign
+    trustedURLs = [...trustedURLs, ...trustedDomains];
+  }
+
   // jar acts as browser's cookie jar for the life of the SSR
   const jar = new CookieJar();
 
-  return (nextFetch) => (path, options = {}) => {
+  return (nextFetch) => (url, options = {}) => {
     let nextFetchOptions = { ...options };
 
-    if (options.credentials && isTrustedPath(path, trustedDomains)) {
-      const cookie = constructCookieString(headers.cookie, jar.getCookieStringSync(path));
+    if (options.credentials && isTrustedURL(url, trustedURLs)) {
+      const cookie = constructCookieString(headers.cookie, jar.getCookieStringSync(url));
       nextFetchOptions = deepMerge(
         nextFetchOptions,
         {
@@ -50,7 +62,7 @@ function createBrowserLikeFetch({
       );
     }
 
-    return nextFetch(path, nextFetchOptions)
+    return nextFetch(url, nextFetchOptions)
       .then((fetchedResp) => {
         if (options.credentials && hostname) {
           const cookieStrings = fetchedResp.headers.raw()['set-cookie'] || [];
@@ -68,10 +80,10 @@ function createBrowserLikeFetch({
                 };
                 res.cookie(key, value, expressCookieOptions);
               }
-              jar.setCookieSync(cookie, path);
+              jar.setCookieSync(cookie, url);
             } catch (error) {
               // eslint-disable-next-line no-console
-              console.warn(`Warning: failed to set cookie "${key}" from path "${path}" with the following error, "${error.message}"`);
+              console.warn(`Warning: failed to set cookie "${key}" from path "${url}" with the following error, "${error.message}"`);
             }
           });
         }

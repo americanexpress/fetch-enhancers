@@ -117,7 +117,7 @@ const fetchWithRequestHeaders = createBrowserLikeFetch({
   headers,
   hostname: req.hostname,
   res, // Express response
-  trustedDomains: [/example\.com/],
+  trustedURLs: [/^https:\/\/([^./]+\.)*example\.com(\/.*)?$/],
 })(mockFetch);
 ```
 
@@ -160,18 +160,29 @@ const fetchWithRequestHeaders = createBrowserLikeFetch({
   setCookie: (name, value, options) => res.cookie(name, value, {
     ...options, encode: String,
   }),
-  trustedDomains: [/example\.com/],
+  trustedURLs: [/^https:\/\/([^./]+\.)*example\.com(\/.*)?$/],
 })(mockFetch);
 ```
 
-##### `trustedDomains`
+##### `trustedURLs`
 
-A list of [regular expressions](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions) used to test the path given to fetch when making a request.
+A list of [regular expressions](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions) used to test the first argument given to fetch when making a request.
 If the test is successful the enhanced fetch will include provided cookies.
 
 ```js
-const trustedDomains = [/api\.example\.com/, /another\.example\.com/];
+const trustedURLs = [
+  /^https:\/\/api\.example\.com(\/.*)?$/,
+  /^https:\/\/another\.example\.com(\/.*)?$/,
+  // or, more permissively all subdomains, including none
+  /^https:\/\/([^./]+\.)*example\.com(\/.*)?$/,
+];
 ```
+
+As these are regular expressions, be careful to consider values that you also do **not** want matched (ex: `https://example.com.evil.tld/pwned`).
+
+##### `trustedDomains`
+
+Renamed to `trustedURLs`. Usage of `trustedDomains` is deprecated, but values are added to those of `trustedURLs` until the next breaking version.
 
 #### Example
 
@@ -190,7 +201,7 @@ const fetchWithRequestHeaders = createBrowserLikeFetch({
   headers: parseHeaders(req),
   hostname: req.hostname,
   res, // Express response
-  trustedDomains: [/example\.com/],
+  trustedURLs: [/^https:\/\/([^./]+\.)*example\.com(\/.*)?$/],
 })(mockFetch);
 
 fetchWithRequestHeaders('https://example.com', {
