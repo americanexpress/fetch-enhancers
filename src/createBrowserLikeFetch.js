@@ -63,7 +63,8 @@ function createBrowserLikeFetch({
               // "If omitted, defaults to the host of the current document URL, not including
               // subdomains."
               // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie#attributes
-              cookieOptions.domain = getPublicSuffix(new URL(path).host);
+              // host includes the hostname and port but getPublicSuffix expects only the hostname
+              cookieOptions.domain = getPublicSuffix(new URL(path).hostname);
             }
             try {
               const value = decodeURIComponent(valueRaw);
