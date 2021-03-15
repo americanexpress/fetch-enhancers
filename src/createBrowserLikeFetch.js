@@ -13,8 +13,9 @@
  * or implied. See the License for the specific language governing
  * permissions and limitations under the License.
  */
+const { URL } = require('url');
 
-const { CookieJar, parse } = require('tough-cookie');
+const { CookieJar, parse, getPublicSuffix } = require('tough-cookie');
 const deepMerge = require('./deepMergeObjects');
 
 const constructCookieString = (...fragments) => fragments.filter((fragment) => fragment).join('; ');
@@ -58,10 +59,15 @@ function createBrowserLikeFetch({
           cookieStrings.forEach((cookieString) => {
             const cookie = parse(cookieString);
             const { key, value: valueRaw, ...cookieOptions } = cookie.toJSON();
+            if (!cookieOptions.domain) {
+              // "If omitted, defaults to the host of the current document URL, not including
+              // subdomains."
+              // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie#attributes
+              cookieOptions.domain = getPublicSuffix(new URL(path).host);
+            }
             try {
               const value = decodeURIComponent(valueRaw);
-              const cookieDomain = cookieOptions.domain;
-              if (cookieDomain && `.${cookieDomain}`.endsWith(`.${hostname.split('.').slice(-2).join('.')}`)) {
+              if (`.${cookieOptions.domain}`.endsWith(`.${hostname.split('.').slice(-2).join('.')}`)) {
                 const expressCookieOptions = {
                   ...cookieOptions,
                   ...cookieOptions.maxAge ? { maxAge: cookieOptions.maxAge * 1e3 } : undefined,
