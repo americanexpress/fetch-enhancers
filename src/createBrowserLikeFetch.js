@@ -14,7 +14,7 @@
  * permissions and limitations under the License.
  */
 
-const { CookieJar, parse } = require('tough-cookie');
+const { CookieJar, parse, getPublicSuffix } = require('tough-cookie');
 const deepMerge = require('./deepMergeObjects');
 
 const constructCookieString = (...fragments) => fragments.filter((fragment) => fragment).join('; ');
@@ -49,6 +49,8 @@ function createBrowserLikeFetch({
   // jar acts as browser's cookie jar for the life of the SSR
   const jar = new CookieJar();
 
+  const dottedHostnamePublicSuffix = hostname && `.${getPublicSuffix(hostname)}`;
+
   return (nextFetch) => (url, options = {}) => {
     let nextFetchOptions = { ...options };
 
@@ -70,21 +72,29 @@ function createBrowserLikeFetch({
           cookieStrings.forEach((cookieString) => {
             const cookie = parse(cookieString);
             const { key, value: valueRaw, ...cookieOptions } = cookie.toJSON();
+            // first run tough-cookie's rules when adding the cookie to the jar
+            // if this throws then the cookie is not valid for the configured hostname either
             try {
-              const value = decodeURIComponent(valueRaw);
-              const cookieDomain = cookieOptions.domain;
-              if (cookieDomain && `.${cookieDomain}`.endsWith(`.${hostname.split('.').slice(-2).join('.')}`)) {
-                const expressCookieOptions = {
-                  ...cookieOptions,
-                  ...cookieOptions.maxAge ? { maxAge: cookieOptions.maxAge * 1e3 } : undefined,
-                };
-                res.cookie(key, value, expressCookieOptions);
-              }
               jar.setCookieSync(cookie, url);
             } catch (error) {
               // eslint-disable-next-line no-console
               console.warn(`Warning: failed to set cookie "${key}" from path "${url}" with the following error, "${error.message}"`);
+              return;
             }
+
+            // then check if this cookie relates to this hostname
+            const cookieDomain = cookieOptions.domain;
+            if (!(cookieDomain && `.${cookieDomain}`.endsWith(dottedHostnamePublicSuffix))) {
+              return;
+            }
+
+            // valid cookie that relates to this hostname, add it to the response cookies set
+            const value = decodeURIComponent(valueRaw);
+            const expressCookieOptions = {
+              ...cookieOptions,
+              ...cookieOptions.maxAge ? { maxAge: cookieOptions.maxAge * 1e3 } : undefined,
+            };
+            res.cookie(key, value, expressCookieOptions);
           });
         }
         return fetchedResp;

@@ -115,6 +115,52 @@ describe('createCookiePassingFetch', () => {
     expect(setCookie).not.toHaveBeenCalled();
   });
 
+  it('does not call setCookie with mismatching public suffix on response', async () => {
+    const mockFetch = jest.fn(() => Promise.resolve({
+      headers: new Headers({
+        'set-cookie': [
+          'mismatchingpublicsuffixtest=123456; Secure; HttpOnly; domain=not-matching-domain.co.uk',
+        ],
+      }),
+    }));
+    const hostname = 'example.co.uk';
+    const setCookie = jest.fn();
+
+    const fetchWithRequestHeaders = createBrowserLikeFetch({
+      hostname,
+      setCookie,
+    })(mockFetch);
+
+    await fetchWithRequestHeaders('https://example.co.uk', {
+      credentials: 'include',
+    });
+
+    expect(setCookie).not.toHaveBeenCalled();
+  });
+
+  it('does not call setCookie with public suffix on response', async () => {
+    const mockFetch = jest.fn(() => Promise.resolve({
+      headers: new Headers({
+        'set-cookie': [
+          'justpublicsuffixtest=123456; Secure; HttpOnly; domain=co.uk',
+        ],
+      }),
+    }));
+    const hostname = 'example.co.uk';
+    const setCookie = jest.fn();
+
+    const fetchWithRequestHeaders = createBrowserLikeFetch({
+      hostname,
+      setCookie,
+    })(mockFetch);
+
+    await fetchWithRequestHeaders('https://example.co.uk', {
+      credentials: 'include',
+    });
+
+    expect(setCookie).not.toHaveBeenCalled();
+  });
+
   it('sends cookies from headers to fetch requests when credentials are included and URL is trusted', () => {
     const mockFetch = jest.fn(() => Promise.resolve({}));
     const headers = {
@@ -318,8 +364,9 @@ describe('createCookiePassingFetch', () => {
     const hostname = 'hello.example.com';
 
     const enhancedFetch = createBrowserLikeFetch({ hostname, setCookie })(mockFetch);
-    await enhancedFetch('https://example.org/api/some-resource', { credentials: 'include' });
+    await enhancedFetch('https://example.com/api/some-resource', { credentials: 'include' });
 
+    expect(setCookie).toHaveBeenCalledTimes(1);
     expect(setCookie.mock.calls[0][0]).toEqual('serialized');
     expect(setCookie.mock.calls[0][1]).toEqual('hello:world%🌍');
     expect(setCookie.mock.calls[0][2].domain).toEqual('example.com');
