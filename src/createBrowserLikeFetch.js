@@ -38,6 +38,8 @@ function createBrowserLikeFetch({
   // jar acts as browser's cookie jar for the life of the SSR
   const jar = new CookieJar();
 
+  const dottedHostnamePublicSuffix = hostname && `.${getPublicSuffix(hostname)}`;
+
   return (nextFetch) => (path, options = {}) => {
     let nextFetchOptions = { ...options };
 
@@ -59,6 +61,16 @@ function createBrowserLikeFetch({
           cookieStrings.forEach((cookieString) => {
             const cookie = parse(cookieString);
             const { key, value: valueRaw, ...cookieOptions } = cookie.toJSON();
+            // first run tough-cookie's rules when adding the cookie to the jar
+            // if this throws then the cookie is not valid for the configured hostname either
+            try {
+              jar.setCookieSync(cookie, path);
+            } catch (error) {
+              // eslint-disable-next-line no-console
+              console.warn(`Warning: failed to set cookie "${key}" from path "${path}" with the following error, "${error.message}"`);
+              return;
+            }
+
             if (!cookieOptions.domain) {
               // "If omitted, defaults to the host of the current document URL, not including
               // subdomains."
@@ -66,20 +78,19 @@ function createBrowserLikeFetch({
               // host includes the hostname and port but getPublicSuffix expects only the hostname
               cookieOptions.domain = getPublicSuffix(new URL(path).hostname);
             }
-            try {
-              const value = decodeURIComponent(valueRaw);
-              if (`.${cookieOptions.domain}`.endsWith(`.${hostname.split('.').slice(-2).join('.')}`)) {
-                const expressCookieOptions = {
-                  ...cookieOptions,
-                  ...cookieOptions.maxAge ? { maxAge: cookieOptions.maxAge * 1e3 } : undefined,
-                };
-                res.cookie(key, value, expressCookieOptions);
-              }
-              jar.setCookieSync(cookie, path);
-            } catch (error) {
-              // eslint-disable-next-line no-console
-              console.warn(`Warning: failed to set cookie "${key}" from path "${path}" with the following error, "${error.message}"`);
+            // then check if this cookie relates to this hostname
+            const cookieDomain = cookieOptions.domain;
+            if (!(cookieDomain && `.${cookieDomain}`.endsWith(dottedHostnamePublicSuffix))) {
+              return;
             }
+
+            // valid cookie that relates to this hostname, add it to the response cookies set
+            const value = decodeURIComponent(valueRaw);
+            const expressCookieOptions = {
+              ...cookieOptions,
+              ...cookieOptions.maxAge ? { maxAge: cookieOptions.maxAge * 1e3 } : undefined,
+            };
+            res.cookie(key, value, expressCookieOptions);
           });
         }
         return fetchedResp;
