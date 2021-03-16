@@ -14,12 +14,27 @@
  * permissions and limitations under the License.
  */
 
-const createTimeoutFetch = require('./createTimeoutFetch');
-const createBrowserLikeFetch = require('./createBrowserLikeFetch');
-const createRetryFetch = require('./createRetryFetch');
+const defaultMaxRetry = 3;
 
-module.exports = {
-  createTimeoutFetch,
-  createBrowserLikeFetch,
-  createRetryFetch,
-};
+function defaultBackoffStrategy(retryCount) {
+  return new Promise((resolve) => setTimeout(resolve, retryCount * 100));
+}
+
+function createRetryFetch(enhancedFetch,
+  maxRetry = defaultMaxRetry,
+  backoffStrategy = defaultBackoffStrategy) {
+  let n = 0;
+  return (nextFetch) => (path, options = {}) => {
+    const retryFetch = () => enhancedFetch(nextFetch)(path, options)
+      .catch((err) => {
+        if (n < maxRetry) {
+          n += 1;
+          return backoffStrategy(n).then(retryFetch);
+        }
+        throw err;
+      });
+    return retryFetch();
+  };
+}
+
+module.exports = createRetryFetch;

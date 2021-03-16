@@ -21,6 +21,7 @@ Want to get paid for your contributions to `@americanexpress/fetch-enhancers`?
 * [Installation](#installation)
 * [Fetch Enhancers](#fetch-enhancers)
 * [createTimeoutFetch](#createtimeoutfetch-server--browser)
+* [createRetryFetch](#createretryfetch-server--browser)
 * [createBrowserLikeFetch](#createbrowserlikefetch-server-only)
 * [Composing fetch enhancers](#composing-fetch-enhancers)
 * [Creating your own fetch enhancer](#creating-your-own-fetch-enhancer)
@@ -79,6 +80,39 @@ request.then((response) => response.json())
 
 // each request can override the default timeout
 const fastRequest = timeoutFetch('https://example.com/fast', { timeout: 1e3 });
+```
+
+### createRetryFetch [Server & Browser]
+```js
+import { createRetryFetch } from '@americanexpress/fetch-enhancers';
+```
+
+#### Configuring
+`createRetryFetch` has three arguments: another enhanced fetch (required), an *optional* retry count, and an *optional* back off strategy function:
+
+```js
+const enhancedRetryFetch = createRetryFetch(enhancedTimeoutFetch)(fetch);
+```
+
+Optional retry count and back off strategy function that accepts the current retry count:
+```js
+const enhancedRetryFetch = createRetryFetch(enhancedTimeoutFetch, 3,
+  (n) => new Promise((res) => setTimeout(res, n * 1000)))(fetch);
+```
+
+#### Example
+
+```js
+import { createRetryFetch } from '@americanexpress/fetch-enhancers';
+
+const retryFetch = createRetryFetch(createTimeoutFetch(500))(fetch);
+
+// Then use retryFetch as you would normally
+const request = retryFetch('https://example.com');
+request.then((response) => response.json())
+  .then((data) => {
+    console.log(data);
+  });
 ```
 
 ### createBrowserLikeFetch [Server only]
