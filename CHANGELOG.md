@@ -1,3 +1,10 @@
+## [1.0.4](https://github.com/americanexpress/fetch-enhancers/compare/v1.0.3...v1.0.4) (2021-03-16)
+
+
+### Bug Fixes
+
+* **createBrowserLikeFetch:** run validation rules first ([#13](https://github.com/americanexpress/fetch-enhancers/issues/13)) ([ee8b963](https://github.com/americanexpress/fetch-enhancers/commit/ee8b96381021957c34dbf93f9b2b0e691bc953ef))
+
 ## [1.0.3](https://github.com/americanexpress/fetch-enhancers/compare/v1.0.2...v1.0.3) (2020-09-08)
 
 
