@@ -300,10 +300,8 @@ describe('createCookiePassingFetch', () => {
   });
 
   it('should catch, log, and still resolve if a cookie was not able to be set', async () => {
-    const RealConsole = console;
-    const warn = jest.fn();
-    const mockedConsole = { warn };
-    global.console = mockedConsole;
+    jest.spyOn(console, 'warn');
+    console.warn.mockClear();
 
     const invalidDomain = 'example.net';
     const headers = new Headers({
@@ -321,10 +319,8 @@ describe('createCookiePassingFetch', () => {
     await expect(enhancedFetch('https://some-domain.example.com/api/some-resource', { credentials: 'include' }))
       .resolves.toBe(response);
     expect(setCookie).not.toHaveBeenCalled();
-    expect(warn.mock.calls[0][0])
-      .toBe(`Warning: failed to set cookie "id" from path "https://some-domain.example.com/api/some-resource" with the following error, "Cookie not in this host's domain. Cookie:${invalidDomain} Request:some-domain.example.com"`);
-
-    global.console = RealConsole;
+    expect(console.warn.mock.calls[0][0])
+      .toBe('Warning: failed to set cookie "id" from path "https://some-domain.example.com/api/some-resource" with the following error, "Cookie not in this host\'s domain. Cookie:example.net Request:some-domain.example.com"');
   });
 
   it('does not send an empty string cookie header', async () => {
