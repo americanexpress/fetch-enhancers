@@ -17,8 +17,24 @@
 const { CookieJar, parse, getPublicSuffix } = require('tough-cookie');
 const deepMerge = require('./deepMergeObjects');
 
-const constructCookieString = (...fragments) => fragments.filter((fragment) => fragment).join('; ');
 const isTrustedPath = (path, trustedRegExp) => trustedRegExp.some((t) => new RegExp(t).test(path));
+
+const constructCookieHeader = (...parsedCookies) => [
+  // remove duplicates via Map, last one in wins
+  ...new Map(
+    parsedCookies.map((parsedCookie) => [parsedCookie.key, parsedCookie])
+  )
+    .values(),
+
+]
+  // then convert to `cookie` form and join
+  .map((parsedCookie) => parsedCookie.cookieString())
+  .join('; ');
+
+const parseCookieHeader = (cookieHeader) => (cookieHeader
+  ? cookieHeader.split(';').map((individualCookieHeader) => parse(individualCookieHeader))
+  : []
+);
 
 const noop = () => 0;
 
@@ -38,12 +54,23 @@ function createBrowserLikeFetch({
   const jar = new CookieJar();
 
   const dottedHostnamePublicSuffix = hostname && `.${getPublicSuffix(hostname)}`;
+  // build a list of cookies on creation to ease deduplication on each request
+  const headerCookies = parseCookieHeader(headers.cookie);
 
   return (nextFetch) => (path, options = {}) => {
     let nextFetchOptions = { ...options };
 
-    if (options.credentials && isTrustedPath(path, trustedDomains)) {
-      const cookie = constructCookieString(headers.cookie, jar.getCookieStringSync(path));
+    if (!options.credentials) {
+      return nextFetch(path, nextFetchOptions);
+    }
+
+    if (isTrustedPath(path, trustedDomains)) {
+      const cookie = constructCookieHeader(
+        ...headerCookies,
+        ...jar.getCookiesSync(path),
+        ...parseCookieHeader(options.headers && options.headers.cookie)
+      );
+
       nextFetchOptions = deepMerge(
         nextFetchOptions,
         {
@@ -52,39 +79,41 @@ function createBrowserLikeFetch({
       );
     }
 
+    if (!hostname) {
+      return nextFetch(path, nextFetchOptions);
+    }
+
     return nextFetch(path, nextFetchOptions)
       .then((fetchedResp) => {
-        if (options.credentials && hostname) {
-          const cookieStrings = fetchedResp.headers.raw()['set-cookie'] || [];
+        const cookieStrings = fetchedResp.headers.raw()['set-cookie'] || [];
 
-          cookieStrings.forEach((cookieString) => {
-            const cookie = parse(cookieString);
-            const { key, value: valueRaw, ...cookieOptions } = cookie.toJSON();
-            // first run tough-cookie's rules when adding the cookie to the jar
-            // if this throws then the cookie is not valid for the configured hostname either
-            try {
-              jar.setCookieSync(cookie, path);
-            } catch (error) {
-              // eslint-disable-next-line no-console
-              console.warn(`Warning: failed to set cookie "${key}" from path "${path}" with the following error, "${error.message}"`);
-              return;
-            }
+        cookieStrings.forEach((cookieString) => {
+          const cookie = parse(cookieString);
+          const { key, value: valueRaw, ...cookieOptions } = cookie.toJSON();
+          // first run tough-cookie's rules when adding the cookie to the jar
+          // if this throws then the cookie is not valid for the configured hostname either
+          try {
+            jar.setCookieSync(cookie, path);
+          } catch (error) {
+            // eslint-disable-next-line no-console
+            console.warn(`Warning: failed to set cookie "${key}" from path "${path}" with the following error, "${error.message}"`);
+            return;
+          }
 
-            // then check if this cookie relates to this hostname
-            const cookieDomain = cookieOptions.domain;
-            if (!(cookieDomain && `.${cookieDomain}`.endsWith(dottedHostnamePublicSuffix))) {
-              return;
-            }
+          // then check if this cookie relates to this hostname
+          const cookieDomain = cookieOptions.domain;
+          if (!(cookieDomain && `.${cookieDomain}`.endsWith(dottedHostnamePublicSuffix))) {
+            return;
+          }
 
-            // valid cookie that relates to this hostname, add it to the response cookies set
-            const value = decodeURIComponent(valueRaw);
-            const expressCookieOptions = {
-              ...cookieOptions,
-              ...cookieOptions.maxAge ? { maxAge: cookieOptions.maxAge * 1e3 } : undefined,
-            };
-            res.cookie(key, value, expressCookieOptions);
-          });
-        }
+          // valid cookie that relates to this hostname, add it to the response cookies set
+          const value = decodeURIComponent(valueRaw);
+          const expressCookieOptions = {
+            ...cookieOptions,
+            ...cookieOptions.maxAge ? { maxAge: cookieOptions.maxAge * 1e3 } : undefined,
+          };
+          res.cookie(key, value, expressCookieOptions);
+        });
         return fetchedResp;
       });
   };
