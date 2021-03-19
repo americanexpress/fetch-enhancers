@@ -1,3 +1,10 @@
+## [1.0.5](https://github.com/americanexpress/fetch-enhancers/compare/v1.0.4...v1.0.5) (2021-03-19)
+
+
+### Bug Fixes
+
+* **createBrowserLikeFetch:** de-duplicate cookies sent ([#16](https://github.com/americanexpress/fetch-enhancers/issues/16)) ([693629f](https://github.com/americanexpress/fetch-enhancers/commit/693629fa544fc039070a9cea9b3161aa18f9f35a))
+
 ## [1.0.4](https://github.com/americanexpress/fetch-enhancers/compare/v1.0.3...v1.0.4) (2021-03-16)
 
 
