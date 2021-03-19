@@ -211,6 +211,64 @@ describe('createCookiePassingFetch', () => {
     });
   });
 
+  it('sends un-duplicated cookies from headers and previous fetch responses to fetch requests', async () => {
+    expect.assertions(4);
+    const mockFetch = jest.fn(() => Promise.resolve({
+      headers: new Headers({
+        'set-cookie': [
+          'duplicated=fetch-response; Secure; HttpOnly; domain=example.net',
+        ],
+      }),
+    }));
+    const headers = {
+      cookie: 'duplicated=client-request; another=yay',
+    };
+    const trustedDomains = [/^https:\/\/safe-to-send\.example\.net\/.+$/];
+    const hostname = 'www.example.net';
+    const enhancedFetch = createBrowserLikeFetch({ trustedDomains, headers, hostname })(mockFetch);
+
+    await enhancedFetch('https://safe-to-send.example.net/api/some-resource', { credentials: 'include' });
+
+    expect(mockFetch).toHaveBeenCalledTimes(1);
+    await enhancedFetch('https://safe-to-send.example.net/api/some-resource', { credentials: 'include' });
+
+    expect(mockFetch).toHaveBeenCalledTimes(2);
+    expect(mockFetch.mock.calls[1][1]).toHaveProperty('headers.cookie', 'duplicated=fetch-response; another=yay');
+    expect(mockFetch.mock.calls[1][1]).not.toHaveProperty('headers.cookie', 'duplicated=client-request; another=yay');
+  });
+
+  it('sends un-duplicated cookies from headers, previous fetch responses, and current options to fetch requests', async () => {
+    expect.assertions(5);
+    const mockFetch = jest.fn(() => Promise.resolve({
+      headers: new Headers({
+        'set-cookie': [
+          'duplicated=fetch-response; Secure; HttpOnly; domain=example.net',
+        ],
+      }),
+    }));
+    const headers = {
+      cookie: 'duplicated=client-request; another=yay',
+    };
+    const trustedDomains = [/^https:\/\/safe-to-send\.example\.net\/.+$/];
+    const hostname = 'www.example.net';
+    const enhancedFetch = createBrowserLikeFetch({ trustedDomains, headers, hostname })(mockFetch);
+
+    await enhancedFetch('https://safe-to-send.example.net/api/some-resource', { credentials: 'include' });
+
+    expect(mockFetch).toHaveBeenCalledTimes(1);
+    await enhancedFetch('https://safe-to-send.example.net/api/some-resource', {
+      credentials: 'include',
+      headers: {
+        cookie: 'duplicated=fetch-option',
+      },
+    });
+
+    expect(mockFetch).toHaveBeenCalledTimes(2);
+    expect(mockFetch.mock.calls[1][1]).toHaveProperty('headers.cookie', 'duplicated=fetch-option; another=yay');
+    expect(mockFetch.mock.calls[1][1]).not.toHaveProperty('headers.cookie', 'duplicated=fetch-response; another=yay');
+    expect(mockFetch.mock.calls[1][1]).not.toHaveProperty('headers.cookie', 'duplicated=client-request; another=yay');
+  });
+
   it('does not send cookies from headers to fetch requests when credentials included and path is not a trustedDomain', () => {
     const mockFetch = jest.fn(() => Promise.resolve({}));
     const headers = {
