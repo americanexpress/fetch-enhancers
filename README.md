@@ -88,15 +88,15 @@ import { createRetryFetch } from '@americanexpress/fetch-enhancers';
 ```
 
 #### Configuring
-`createRetryFetch` has three arguments: another enhanced fetch (required), an *optional* retry count, and an *optional* back off strategy function:
+`createRetryFetch` has two arguments: an *optional* retry count (default 3), and an *optional* back off strategy function:
 
 ```js
-const enhancedRetryFetch = createRetryFetch(enhancedTimeoutFetch)(fetch);
+const enhancedRetryFetch = createRetryFetch()(fetch);
 ```
 
 Optional retry count and back off strategy function that accepts the current retry count:
 ```js
-const enhancedRetryFetch = createRetryFetch(enhancedTimeoutFetch, 3,
+const enhancedRetryFetch = createRetryFetch(5,
   (n) => new Promise((res) => setTimeout(res, n * 1000)))(fetch);
 ```
 
@@ -105,7 +105,7 @@ const enhancedRetryFetch = createRetryFetch(enhancedTimeoutFetch, 3,
 ```js
 import { createRetryFetch } from '@americanexpress/fetch-enhancers';
 
-const retryFetch = createRetryFetch(createTimeoutFetch(500))(fetch);
+const retryFetch = createRetryFetch()(createTimeoutFetch(5e3)(fetch));
 
 // Then use retryFetch as you would normally
 const request = retryFetch('https://example.com');

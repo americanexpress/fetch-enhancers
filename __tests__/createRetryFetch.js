@@ -27,16 +27,14 @@ function resolveInMs(ms) {
 describe('createRetryFetch', () => {
   it('should resolve if the response finishes before the default timeout', async () => {
     const mockFetch = jest.fn(() => resolveInMs(100));
-    const anotherEnhancedFetch = createTimeoutFetch(500);
-    const enhancedFetch = createRetryFetch(anotherEnhancedFetch)(mockFetch);
+    const enhancedFetch = createRetryFetch()(mockFetch);
     const promise = enhancedFetch('/test');
     await expect(promise).resolves.toBe('Fetch Resolved');
   });
 
   it('should not retry if the response finishes before the default timeout', async () => {
     const mockFetch = jest.fn(() => resolveInMs(100));
-    const timeoutFetch = createTimeoutFetch(500);
-    const enhancedFetch = createRetryFetch(timeoutFetch)(mockFetch);
+    const enhancedFetch = createTimeoutFetch(5e2)(createRetryFetch()(mockFetch));
     const promise = enhancedFetch('/test');
     await expect(promise).resolves.toBe('Fetch Resolved');
     expect(mockFetch).toHaveBeenCalledTimes(1);
@@ -44,17 +42,15 @@ describe('createRetryFetch', () => {
 
   it('should retry 3 times (default) if the response takes longer than custom timeout that is shorter than the default', async () => {
     const mockFetch = jest.fn(() => resolveInMs(500));
-    const timeoutFetch = createTimeoutFetch(100);
-    const enhancedFetch = createRetryFetch(timeoutFetch)(mockFetch);
+    const enhancedFetch = createRetryFetch()(createTimeoutFetch(1e2)(mockFetch));
     const promise = enhancedFetch('/test');
     await expect(promise).rejects.toEqual(new TimeoutError('/test after 100ms'));
     expect(mockFetch).toHaveBeenCalledTimes(4);
   });
 
   it('should retry 1 time if the response takes longer than custom timeout that is shorter than the default', async () => {
-    const mockFetch = jest.fn(() => resolveInMs(500));
-    const timeoutFetch = createTimeoutFetch(100);
-    const enhancedFetch = createRetryFetch(timeoutFetch, 1)(mockFetch);
+    const mockFetch = jest.fn(() => resolveInMs(5e2));
+    const enhancedFetch = createRetryFetch(1)(createTimeoutFetch(1e2)(mockFetch));
     const promise = enhancedFetch('/test');
     await expect(promise).rejects.toEqual(new TimeoutError('/test after 100ms'));
     expect(mockFetch).toHaveBeenCalledTimes(2);
@@ -66,8 +62,8 @@ describe('createRetryFetch', () => {
       return Promise.resolve();
     });
     const mockFetch = jest.fn(() => resolveInMs(500));
-    const timeoutFetch = createTimeoutFetch(100);
-    const enhancedFetch = createRetryFetch(timeoutFetch, 1, mockBackoffStrategy)(mockFetch);
+    const enhancedFetch = createRetryFetch(1,
+      mockBackoffStrategy)(createTimeoutFetch(1e2)(mockFetch));
     const promise = enhancedFetch('/test');
     await expect(promise).rejects.toEqual(new TimeoutError('/test after 100ms'));
     expect(mockBackoffStrategy).toHaveBeenCalledTimes(1);
