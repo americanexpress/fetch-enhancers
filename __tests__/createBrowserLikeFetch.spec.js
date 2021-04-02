@@ -161,6 +161,32 @@ describe('createCookiePassingFetch', () => {
     expect(setCookie).not.toHaveBeenCalled();
   });
 
+  it('calls setCookie when using the default the domain attribute when missing in the response', async () => {
+    const mockFetch = jest.fn(() => Promise.resolve({
+      headers: new Headers({
+        'set-cookie': [
+          'sessionid=123456; Secure; HttpOnly',
+        ],
+      }),
+    }));
+    const hostname = 'example.com';
+    const setCookie = jest.fn();
+
+    const fetchWithRequestHeaders = createBrowserLikeFetch({
+      hostname,
+      setCookie,
+    })(mockFetch);
+
+    await fetchWithRequestHeaders('https://www.example.com', {
+      credentials: 'include',
+    });
+
+    expect(setCookie).toHaveBeenCalledTimes(1);
+    expect(setCookie.mock.calls[0][0]).toEqual('sessionid');
+    expect(setCookie.mock.calls[0][1]).toEqual('123456');
+    expect(setCookie.mock.calls[0][2]).toHaveProperty('domain', 'example.com');
+  });
+
   it('sends cookies from headers to fetch requests when credentials included and path is a trustedDomain', () => {
     const mockFetch = jest.fn(() => Promise.resolve({}));
     const headers = {
