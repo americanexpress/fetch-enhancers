@@ -20,8 +20,10 @@ function defaultBackoffStrategy(retryCount) {
   return new Promise((resolve) => setTimeout(resolve, retryCount * 100));
 }
 
-function createRetryFetch(maxRetry = defaultMaxRetry,
-  backoffStrategy = defaultBackoffStrategy) {
+function createRetryFetch({
+  maxRetry = defaultMaxRetry,
+  backoffStrategy = defaultBackoffStrategy,
+} = {}) {
   let n = 0;
   return (nextFetch) => (path, options = {}) => {
     const retryFetch = () => nextFetch(path, options)

@@ -24,6 +24,13 @@ describe('createRetryFetch', () => {
     await expect(enhancedFetch('/')).resolves.toBe('Fetch Resolved');
   });
 
+  it('should resolve with invalid config', async () => {
+    const mockFetch = jest.fn()
+      .mockImplementationOnce(() => Promise.resolve('Fetch Resolved'));
+    const enhancedFetch = createRetryFetch({})(mockFetch);
+    await expect(enhancedFetch('/')).resolves.toBe('Fetch Resolved');
+  });
+
   it('should reject on failure', async () => {
     const mockFetch = jest.fn()
       .mockImplementationOnce(() => Promise.reject(new Error('test rejection error')))
@@ -57,23 +64,27 @@ describe('createRetryFetch', () => {
     const mockFetch = jest.fn()
       .mockImplementationOnce(() => Promise.reject(new Error('test rejection error')))
       .mockImplementationOnce(() => Promise.resolve('Fetch Resolved'));
-    const enhancedFetch = createRetryFetch(1)(mockFetch);
+    const enhancedFetch = createRetryFetch({
+      maxRetry: 1,
+    })(mockFetch);
     await expect(enhancedFetch('/')).resolves.toBe('Fetch Resolved');
     expect(mockFetch).toHaveBeenCalledTimes(2);
   });
 
   it('should run supplied backoff strategy with suppied max retries', async () => {
-    const mockBackoffStrategy = jest.fn((retryCount) => {
+    const backoffStrategy = jest.fn((retryCount) => {
       expect(retryCount).toEqual(1);
       return Promise.resolve();
     });
     const mockFetch = jest.fn()
       .mockImplementationOnce(() => Promise.reject(new Error('test rejection error')))
       .mockImplementationOnce(() => Promise.resolve('Fetch Resolved'));
-    const enhancedFetch = createRetryFetch(1,
-      mockBackoffStrategy)(mockFetch);
+    const enhancedFetch = createRetryFetch({
+      maxRetry: 1,
+      backoffStrategy,
+    })(mockFetch);
     await expect(enhancedFetch('/')).resolves.toBe('Fetch Resolved');
-    expect(mockBackoffStrategy).toHaveBeenCalledTimes(1);
+    expect(backoffStrategy).toHaveBeenCalledTimes(1);
     expect(mockFetch).toHaveBeenCalledTimes(2);
   });
 });

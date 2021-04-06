@@ -18,13 +18,30 @@ Want to get paid for your contributions to `@americanexpress/fetch-enhancers`?
 
 ## 🤹‍ Usage
 
-* [Installation](#installation)
-* [Fetch Enhancers](#fetch-enhancers)
-* [createTimeoutFetch](#createtimeoutfetch-server--browser)
-* [createRetryFetch](#createretryfetch-server--browser)
-* [createBrowserLikeFetch](#createbrowserlikefetch-server-only)
-* [Composing fetch enhancers](#composing-fetch-enhancers)
-* [Creating your own fetch enhancer](#creating-your-own-fetch-enhancer)
+- [👩‍💻 Hiring 👨‍💻](#-hiring-)
+- [📖 Table of Contents](#-table-of-contents)
+- [🤹‍ Usage](#-usage)
+  - [Installation](#installation)
+  - [Fetch Enhancers](#fetch-enhancers)
+  - [createTimeoutFetch [Server & Browser]](#createtimeoutfetch-server--browser)
+    - [Configuring](#configuring)
+    - [Example](#example)
+  - [createRetryFetch [Server & Browser]](#createretryfetch-server--browser)
+    - [Configuring](#configuring-1)
+    - [Example](#example-1)
+  - [createBrowserLikeFetch [Server only]](#createbrowserlikefetch-server-only)
+    - [Configuring](#configuring-2)
+      - [`headers`](#headers)
+      - [`hostname`](#hostname)
+      - [`res`](#res)
+      - [`setCookie`](#setcookie)
+      - [`trustedDomains`](#trusteddomains)
+    - [Example](#example-2)
+- [Composing fetch enhancers](#composing-fetch-enhancers)
+- [Creating your own fetch enhancer](#creating-your-own-fetch-enhancer)
+- [🏆 Contributing](#-contributing)
+- [🗝️ License](#️-license)
+- [🗣️ Code of Conduct](#️-code-of-conduct)
 
 ### Installation
 
@@ -88,7 +105,7 @@ import { createRetryFetch } from '@americanexpress/fetch-enhancers';
 ```
 
 #### Configuring
-`createRetryFetch` has two arguments: an *optional* retry count (default 3), and an *optional* back off strategy function:
+`createRetryFetch` accepts the an object with the following configuration: an *optional* maxRetry (default 3), and an *optional* back off strategy function:
 
 ```js
 const enhancedRetryFetch = createRetryFetch()(fetch);
@@ -96,8 +113,10 @@ const enhancedRetryFetch = createRetryFetch()(fetch);
 
 Optional retry count and back off strategy function that accepts the current retry count:
 ```js
-const enhancedRetryFetch = createRetryFetch(5,
-  (n) => new Promise((res) => setTimeout(res, n * 1000)))(fetch);
+const enhancedRetryFetch = createRetryFetch({
+  maxRetry: 5,
+  backoffStrategy: (n) => new Promise((res) => setTimeout(res, n * 1000)),
+})(fetch);
 ```
 
 #### Example
