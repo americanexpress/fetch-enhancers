@@ -1,3 +1,10 @@
+## [1.0.6](https://github.com/americanexpress/fetch-enhancers/compare/v1.0.5...v1.0.6) (2021-04-02)
+
+
+### Bug Fixes
+
+* **createBrowserLikeFetch:** use non-subdomain host as default domain ([#17](https://github.com/americanexpress/fetch-enhancers/issues/17)) ([0ccdc70](https://github.com/americanexpress/fetch-enhancers/commit/0ccdc7025860c4b51fd91ab04da074073ddb666b))
+
 ## [1.0.5](https://github.com/americanexpress/fetch-enhancers/compare/v1.0.4...v1.0.5) (2021-03-19)
 
 
