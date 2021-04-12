@@ -118,7 +118,7 @@ function createBrowserLikeFetch({
             // subdomains."
             // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie#attributes
             // host includes the hostname and port but getPublicSuffix expects only the hostname
-            cookieOptions.domain = getPublicSuffix(new URL(path).hostname);
+            cookieOptions.domain = getPublicSuffix(new URL(url).hostname);
           }
 
           // then check if this cookie relates to this hostname
