@@ -13,6 +13,7 @@
  * or implied. See the License for the specific language governing
  * permissions and limitations under the License.
  */
+const { URL } = require('url');
 
 const { CookieJar, parse, getPublicSuffix } = require('tough-cookie');
 const deepMerge = require('./deepMergeObjects');
@@ -110,6 +111,14 @@ function createBrowserLikeFetch({
             // eslint-disable-next-line no-console
             console.warn(`Warning: failed to set cookie "${key}" from path "${url}" with the following error, "${error.message}"`);
             return;
+          }
+
+          if (!cookieOptions.domain) {
+            // "If omitted, defaults to the host of the current document URL, not including
+            // subdomains."
+            // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie#attributes
+            // host includes the hostname and port but getPublicSuffix expects only the hostname
+            cookieOptions.domain = getPublicSuffix(new URL(path).hostname);
           }
 
           // then check if this cookie relates to this hostname
