@@ -33,10 +33,7 @@ describe('createRetryFetch', () => {
 
   it('should reject on failure', async () => {
     const mockFetch = jest.fn()
-      .mockImplementationOnce(() => Promise.reject(new Error('test rejection error')))
-      .mockImplementationOnce(() => Promise.reject(new Error('test rejection error')))
-      .mockImplementationOnce(() => Promise.reject(new Error('test rejection error')))
-      .mockImplementationOnce(() => Promise.reject(new Error('test rejection error')));
+      .mockImplementation(() => Promise.reject(new Error('test rejection error')));
     const enhancedFetch = createRetryFetch()(mockFetch);
     await expect(enhancedFetch('/')).rejects.toEqual(new Error('test rejection error'));
   });
