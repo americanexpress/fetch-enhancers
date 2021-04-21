@@ -18,7 +18,7 @@ const { URL } = require('url');
 const { CookieJar, parse, getPublicSuffix } = require('tough-cookie');
 const deepMerge = require('./deepMergeObjects');
 
-const isTrustedPath = (path, trustedRegExp) => trustedRegExp.some((t) => new RegExp(t).test(path));
+const isTrustedURL = (path, trustedRegExp) => trustedRegExp.some((t) => new RegExp(t).test(path));
 
 const constructCookieHeader = (...parsedCookies) => [
   // remove duplicates via Map, last one in wins
@@ -44,12 +44,24 @@ function createBrowserLikeFetch({
   hostname,
   res = { cookie: noop },
   setCookie,
-  trustedDomains = [],
+  trustedURLs = [],
+  trustedDomains,
 } = {}) {
   // do not destructure `cookie`. Express req.cookie requires `this` to equal
   // context of express middleware.
   // https://github.com/expressjs/express/blob/master/lib/response.js#L833
   res.cookie = setCookie || res.cookie;
+
+  // trustedDomains is deprecated for matching URLs instead of just domains
+  // remove in the next major/breaking version
+  if (trustedDomains) {
+    // notify the user of the deprecation
+    // eslint-disable-next-line no-console
+    console.warn('createBrowserLikeFetch: trustedDomains option is deprecated in favor of trustedURLs, adding entries to trustedURLs');
+    // avoid mutation of the parameter (ex: `trustedURLs.push(...trustedDomains)`)
+    // eslint-disable-next-line no-param-reassign
+    trustedURLs = [...trustedURLs, ...trustedDomains];
+  }
 
   // jar acts as browser's cookie jar for the life of the SSR
   const jar = new CookieJar();
@@ -58,17 +70,17 @@ function createBrowserLikeFetch({
   // build a list of cookies on creation to ease deduplication on each request
   const headerCookies = parseCookieHeader(headers.cookie);
 
-  return (nextFetch) => (path, options = {}) => {
+  return (nextFetch) => (url, options = {}) => {
     let nextFetchOptions = { ...options };
 
     if (!options.credentials) {
-      return nextFetch(path, nextFetchOptions);
+      return nextFetch(url, nextFetchOptions);
     }
 
-    if (isTrustedPath(path, trustedDomains)) {
+    if (isTrustedURL(url, trustedURLs)) {
       const cookie = constructCookieHeader(
         ...headerCookies,
-        ...jar.getCookiesSync(path),
+        ...jar.getCookiesSync(url),
         ...parseCookieHeader(options.headers && options.headers.cookie)
       );
 
@@ -81,10 +93,10 @@ function createBrowserLikeFetch({
     }
 
     if (!hostname) {
-      return nextFetch(path, nextFetchOptions);
+      return nextFetch(url, nextFetchOptions);
     }
 
-    return nextFetch(path, nextFetchOptions)
+    return nextFetch(url, nextFetchOptions)
       .then((fetchedResp) => {
         const cookieStrings = fetchedResp.headers.raw()['set-cookie'] || [];
 
@@ -94,10 +106,10 @@ function createBrowserLikeFetch({
           // first run tough-cookie's rules when adding the cookie to the jar
           // if this throws then the cookie is not valid for the configured hostname either
           try {
-            jar.setCookieSync(cookie, path);
+            jar.setCookieSync(cookie, url);
           } catch (error) {
             // eslint-disable-next-line no-console
-            console.warn(`Warning: failed to set cookie "${key}" from path "${path}" with the following error, "${error.message}"`);
+            console.warn(`Warning: failed to set cookie "${key}" from path "${url}" with the following error, "${error.message}"`);
             return;
           }
 
@@ -106,7 +118,7 @@ function createBrowserLikeFetch({
             // subdomains."
             // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie#attributes
             // host includes the hostname and port but getPublicSuffix expects only the hostname
-            cookieOptions.domain = getPublicSuffix(new URL(path).hostname);
+            cookieOptions.domain = getPublicSuffix(new URL(url).hostname);
           }
 
           // then check if this cookie relates to this hostname
