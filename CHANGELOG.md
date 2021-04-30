@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/americanexpress/fetch-enhancers/compare/v1.0.7...v1.1.0) (2021-04-30)
+
+
+### Features
+
+* **createRetryFetch:** adding an enhanced retry fetch  ([#18](https://github.com/americanexpress/fetch-enhancers/issues/18)) ([13fcb4c](https://github.com/americanexpress/fetch-enhancers/commit/13fcb4cd47d01c9697c388b20395f9b14703906e))
+
 ## [1.0.7](https://github.com/americanexpress/fetch-enhancers/compare/v1.0.6...v1.0.7) (2021-04-21)
 
 
