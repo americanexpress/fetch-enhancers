@@ -293,6 +293,26 @@ describe('createCookiePassingFetch', () => {
     });
   });
 
+  it('skips sending malformed cookies from headers', () => {
+    const mockFetch = jest.fn(() => Promise.resolve({}));
+    const headers = {
+      cookie: 'sessionid=123456;789;much=fun;',
+    };
+    const trustedDomains = [/^https:\/\/safe-to-send\.example\.net\/api\/.+$/];
+    const enhancedFetch = createBrowserLikeFetch({ trustedDomains, headers })(mockFetch);
+
+    enhancedFetch('https://safe-to-send.example.net/api/some-resource', {
+      credentials: 'include',
+    });
+
+    expect(mockFetch).toHaveBeenCalledWith('https://safe-to-send.example.net/api/some-resource', {
+      credentials: 'include',
+      headers: {
+        cookie: 'sessionid=123456; much=fun',
+      },
+    });
+  });
+
   it('does not send cookies from headers to fetch requests when credentials are included and URL is not trusted', () => {
     const mockFetch = jest.fn(() => Promise.resolve({}));
     const headers = {

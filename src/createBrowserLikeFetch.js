@@ -33,7 +33,7 @@ const constructCookieHeader = (...parsedCookies) => [
   .join('; ');
 
 const parseCookieHeader = (cookieHeader) => (cookieHeader
-  ? cookieHeader.split(';').map((individualCookieHeader) => parse(individualCookieHeader))
+  ? cookieHeader.split(';').map((individualCookieHeader) => parse(individualCookieHeader)).filter(Boolean)
   : []
 );
 
