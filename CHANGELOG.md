@@ -1,3 +1,10 @@
+## [1.1.1](https://github.com/americanexpress/fetch-enhancers/compare/v1.1.0...v1.1.1) (2021-05-20)
+
+
+### Bug Fixes
+
+* **createBrowserLikeFetch:** skip malformed header cookies ([#19](https://github.com/americanexpress/fetch-enhancers/issues/19)) ([ff9377a](https://github.com/americanexpress/fetch-enhancers/commit/ff9377a4e45e2e3f551ab4fabe366fed0cf7311e))
+
 # [1.1.0](https://github.com/americanexpress/fetch-enhancers/compare/v1.0.7...v1.1.0) (2021-04-30)
 
 
