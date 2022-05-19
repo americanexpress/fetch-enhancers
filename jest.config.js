@@ -1,4 +1,5 @@
-// jest.config.js
 module.exports = {
-  transform: {},
+  setupFiles: [
+    './test-setup.js',
+  ],
 };

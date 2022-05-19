@@ -14,7 +14,7 @@
  * permissions and limitations under the License.
  */
 
-const TimeoutError = require('../src/TimeoutError');
+import TimeoutError from '../src/TimeoutError';
 
 describe('TimeoutError', () => {
   let error;

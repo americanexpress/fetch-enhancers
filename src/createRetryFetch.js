@@ -17,7 +17,7 @@
 const defaultMaxRetry = 3;
 
 function defaultBackoffStrategy(retryCount) {
-  return new Promise((resolve) => setTimeout(resolve, retryCount * 100));
+  return new Promise((resolve) => { setTimeout(resolve, retryCount * 100); });
 }
 
 function createRetryFetch({
@@ -38,4 +38,4 @@ function createRetryFetch({
   };
 }
 
-module.exports = createRetryFetch;
+export default createRetryFetch;

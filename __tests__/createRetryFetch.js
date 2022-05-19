@@ -14,7 +14,7 @@
  * permissions and limitations under the License.
  */
 
-const createRetryFetch = require('../src/createRetryFetch');
+import createRetryFetch from '../src/createRetryFetch';
 
 describe('createRetryFetch', () => {
   it('should resolve on success', async () => {

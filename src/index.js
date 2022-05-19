@@ -14,12 +14,6 @@
  * permissions and limitations under the License.
  */
 
-const createTimeoutFetch = require('./createTimeoutFetch');
-const createBrowserLikeFetch = require('./createBrowserLikeFetch');
-const createRetryFetch = require('./createRetryFetch');
-
-module.exports = {
-  createTimeoutFetch,
-  createBrowserLikeFetch,
-  createRetryFetch,
-};
+export { default as createTimeoutFetch } from './createTimeoutFetch';
+export { default as createBrowserLikeFetch } from './createBrowserLikeFetch';
+export { default as createRetryFetch } from './createRetryFetch';
