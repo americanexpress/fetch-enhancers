@@ -14,8 +14,8 @@
  * permissions and limitations under the License.
  */
 
-const { Headers } = require('node-fetch');
-const createBrowserLikeFetch = require('../src/createBrowserLikeFetch');
+import { Headers } from 'node-fetch';
+import createBrowserLikeFetch from '../src/createBrowserLikeFetch';
 
 describe('createCookiePassingFetch', () => {
   it('correctly calls setCookie when hostname matches cookie domain on response', async () => {

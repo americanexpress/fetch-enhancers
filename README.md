@@ -115,7 +115,7 @@ Optional retry count and back off strategy function that accepts the current ret
 ```js
 const enhancedRetryFetch = createRetryFetch({
   maxRetry: 5,
-  backoffStrategy: (n) => new Promise((res) => setTimeout(res, n * 1000)),
+  backoffStrategy: (n) => new Promise((res) => { setTimeout(res, n * 1000); }),
 })(fetch);
 ```
 
@@ -130,7 +130,7 @@ const retryFetch = createRetryFetch()(createTimeoutFetch(5e3)(fetch));
 const request = retryFetch('https://example.com');
 request.then((response) => response.json())
   .then((data) => {
-    console.log(data);
+    // do something with data
   });
 ```
 
@@ -170,7 +170,7 @@ const fetchWithRequestHeaders = createBrowserLikeFetch({
   headers,
   hostname: req.hostname,
   res, // Express response
-  trustedURLs: [/^https:\/\/([^./]+\.)*example\.com(\/.*)?$/],
+  trustedURLs: [/^https:\/\/(www\.){0,1}(.*\.)example\.com[#/:?]{0,1}/],
 })(mockFetch);
 ```
 
@@ -213,7 +213,7 @@ const fetchWithRequestHeaders = createBrowserLikeFetch({
   setCookie: (name, value, options) => res.cookie(name, value, {
     ...options, encode: String,
   }),
-  trustedURLs: [/^https:\/\/([^./]+\.)*example\.com(\/.*)?$/],
+  trustedURLs: [/^https:\/\/(www\.){0,1}(.*\.)example\.com[#/:?]{0,1}/],
 })(mockFetch);
 ```
 
@@ -224,10 +224,10 @@ If the test is successful the enhanced fetch will include provided cookies.
 
 ```js
 const trustedURLs = [
-  /^https:\/\/api\.example\.com(\/.*)?$/,
-  /^https:\/\/another\.example\.com(\/.*)?$/,
+  /^https:\/\/api\.example\.com[#/:?]{0,1}/,
+  /^https:\/\/another\.example\.com[#/:?]{0,1}/,
   // or, more permissively all subdomains, including none
-  /^https:\/\/([^./]+\.)*example\.com(\/.*)?$/,
+  /^https:\/\/(www\.){0,1}(.*\.)example\.com[#/:?]{0,1}/,
 ];
 ```
 
@@ -254,7 +254,7 @@ const fetchWithRequestHeaders = createBrowserLikeFetch({
   headers: parseHeaders(req),
   hostname: req.hostname,
   res, // Express response
-  trustedURLs: [/^https:\/\/([^./]+\.)*example\.com(\/.*)?$/],
+  trustedURLs: [/^https:\/\/(www\.){0,1}(.*\.)example\.com[#/:?]{0,1}/],
 })(mockFetch);
 
 fetchWithRequestHeaders('https://example.com', {
@@ -293,7 +293,7 @@ const enhancedFetch = compose(
 const request = enhancedFetch('https://example.com');
 request.then((response) => response.json())
   .then((data) => {
-    console.log(data);
+    // do something with data
   });
 ```
 

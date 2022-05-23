@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 American Express Travel Related Services Company, Inc
+ * Copyright 2022 American Express Travel Related Services Company, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,5 @@
  * permissions and limitations under the License.
  */
 
-function TimeoutError(...arguments_) {
-  const native = Error.apply(this, arguments_);
-  this.name = 'TimeoutError';
-  this.message = native.message;
-  this.stack = native.stack;
-}
-
-TimeoutError.prototype = Object.create(Error.prototype, {
-  constructor: {
-    value: TimeoutError,
-  },
-});
-
-export default TimeoutError;
+import 'core-js/stable';
+import 'regenerator-runtime/runtime';
