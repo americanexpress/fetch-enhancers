@@ -1,3 +1,10 @@
+## [1.1.2](https://github.com/americanexpress/fetch-enhancers/compare/v1.1.1...v1.1.2) (2022-05-25)
+
+
+### Bug Fixes
+
+* **build:** tree shakeable es build ([#36](https://github.com/americanexpress/fetch-enhancers/issues/36)) ([cbe0cc4](https://github.com/americanexpress/fetch-enhancers/commit/cbe0cc451ce187b5ea6700e724965a0cfea6a350))
+
 ## [1.1.1](https://github.com/americanexpress/fetch-enhancers/compare/v1.1.0...v1.1.1) (2021-05-20)
 
 
