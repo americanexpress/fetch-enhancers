@@ -84,12 +84,6 @@
     "abort-controller": "^3.0.0",
     "tough-cookie": "^4.0.0"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "npm run test",
-      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
-    }
-  },
   "release": {
     "branches": [
       "+([0-9])?(.{+([0-9]),x}).x",
