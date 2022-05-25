@@ -8,8 +8,9 @@ export default [
   // CommonJS
   {
     input: 'src/index.js',
+    preserveModules: true,
     output: {
-      file: 'lib/fetch-enhancers.js',
+      dir: 'lib',
       format: 'cjs',
       exports: 'named',
     },
@@ -24,9 +25,10 @@ export default [
   // ES
   {
     input: 'src/index.js',
+    preserveModules: true,
     output: {
-      file: 'es/fetch-enhancers.js',
-      format: 'es',
+      dir: 'es',
+      format: 'esm',
       exports: 'named',
     },
     plugins: [

@@ -13,10 +13,9 @@
  * or implied. See the License for the specific language governing
  * permissions and limitations under the License.
  */
-const { URL } = require('url');
-
-const { CookieJar, parse, getPublicSuffix } = require('tough-cookie');
-const deepMerge = require('./deepMergeObjects');
+import { URL } from 'url';
+import { CookieJar, parse, getPublicSuffix } from 'tough-cookie';
+import deepMerge from './deepMergeObjects';
 
 const isTrustedURL = (path, trustedRegExp) => trustedRegExp.some((t) => new RegExp(t).test(path));
 
@@ -55,11 +54,9 @@ function createBrowserLikeFetch({
   // trustedDomains is deprecated for matching URLs instead of just domains
   // remove in the next major/breaking version
   if (trustedDomains) {
-    // notify the user of the deprecation
-    // eslint-disable-next-line no-console
+    // eslint-disable-next-line no-console -- notify the user of the deprecation
     console.warn('createBrowserLikeFetch: trustedDomains option is deprecated in favor of trustedURLs, adding entries to trustedURLs');
-    // avoid mutation of the parameter (ex: `trustedURLs.push(...trustedDomains)`)
-    // eslint-disable-next-line no-param-reassign
+    // eslint-disable-next-line no-param-reassign -- avoid mutation of the parameter (ex: `trustedURLs.push(...trustedDomains)`)
     trustedURLs = [...trustedURLs, ...trustedDomains];
   }
 
@@ -108,7 +105,7 @@ function createBrowserLikeFetch({
           try {
             jar.setCookieSync(cookie, url);
           } catch (error) {
-            // eslint-disable-next-line no-console
+            // eslint-disable-next-line no-console -- warn user cookie failed to be set
             console.warn(`Warning: failed to set cookie "${key}" from path "${url}" with the following error, "${error.message}"`);
             return;
           }
@@ -140,4 +137,4 @@ function createBrowserLikeFetch({
   };
 }
 
-module.exports = createBrowserLikeFetch;
+export default createBrowserLikeFetch;

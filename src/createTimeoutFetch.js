@@ -14,8 +14,8 @@
  * permissions and limitations under the License.
  */
 
-const AbortController = require('abort-controller');
-const TimeoutError = require('./TimeoutError');
+import AbortController from 'abort-controller';
+import TimeoutError from './TimeoutError';
 
 function abortFetch(controller, signal) {
   return () => {
@@ -59,4 +59,4 @@ function createTimeoutFetch(defaultTimeout) {
   };
 }
 
-module.exports = createTimeoutFetch;
+export default createTimeoutFetch;

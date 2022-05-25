@@ -15,14 +15,14 @@
  */
 
 const merge = (sourceObject, mergeObject) => {
+  const mergedSourceObject = sourceObject;
   Object.keys(mergeObject).forEach((key) => {
     if (Object.prototype.hasOwnProperty.call(sourceObject, key)
                   && typeof sourceObject[key] === 'object'
                   && !Array.isArray(sourceObject[key])) {
-      merge(sourceObject[key], mergeObject[key]);
+      merge(mergedSourceObject[key], mergeObject[key]);
     } else {
-      // eslint-disable-next-line no-param-reassign
-      sourceObject[key] = mergeObject[key];
+      mergedSourceObject[key] = mergeObject[key];
     }
   });
   return sourceObject;
@@ -33,4 +33,4 @@ const deepMergeObjects = (baseObject, ...objs) => {
   return baseObject;
 };
 
-module.exports = deepMergeObjects;
+export default deepMergeObjects;
