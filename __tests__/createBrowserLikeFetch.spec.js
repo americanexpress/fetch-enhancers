@@ -357,6 +357,29 @@ describe('createCookiePassingFetch', () => {
     });
   });
 
+  it('does not send cookies from headers to fetch requests when credentials are set to `omit` but URL is trusted', () => {
+    const mockFetch = jest.fn(() => Promise.resolve({}));
+    const headers = {
+      cookie: 'sessionid=123456',
+    };
+    const trustedURLs = [/^https:\/\/safe-to-send\.example\.com\/api\/.+$/];
+    const enhancedFetch = createBrowserLikeFetch({ trustedURLs, headers })(mockFetch);
+
+    enhancedFetch('https://safe-to-send.example.com/api/some-resource', {
+      credentials: 'omit',
+      headers: {
+        'Custom-Header': 'some header for this request',
+      },
+    });
+
+    expect(mockFetch).toHaveBeenCalledWith('https://safe-to-send.example.com/api/some-resource', {
+      credentials: 'omit',
+      headers: {
+        'Custom-Header': 'some header for this request',
+      },
+    });
+  });
+
   it('sends along cookies that were set by a previous request', async () => {
     const mockFetch = jest.fn((url) => {
       switch (url) {

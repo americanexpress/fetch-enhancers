@@ -70,7 +70,7 @@ function createBrowserLikeFetch({
   return (nextFetch) => (url, options = {}) => {
     let nextFetchOptions = { ...options };
 
-    if (!options.credentials) {
+    if (!options.credentials || options.credentials === 'omit') {
       return nextFetch(url, nextFetchOptions);
     }
 
