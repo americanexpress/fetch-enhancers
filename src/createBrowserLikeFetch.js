@@ -74,6 +74,10 @@ function createBrowserLikeFetch({
       return nextFetch(url, nextFetchOptions);
     }
 
+    if (options.credentials === 'same-origin' && hostname !== new URL(url).hostname) {
+      return nextFetch(url, nextFetchOptions);
+    }
+
     if (isTrustedURL(url, trustedURLs)) {
       const cookie = constructCookieHeader(
         ...headerCookies,
