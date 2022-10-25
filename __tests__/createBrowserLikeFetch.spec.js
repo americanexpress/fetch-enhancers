@@ -211,6 +211,30 @@ describe('createCookiePassingFetch', () => {
     });
   });
 
+  it('sends cookies from headers to fetch requests when credentials are set to `same-origin`, and the origins match and URL is trusted', () => {
+    const mockFetch = jest.fn(() => Promise.resolve({}));
+    const headers = {
+      cookie: 'sessionid=123456',
+    };
+    const trustedURLs = [/^https:\/\/safe-to-send\.example\.net\/api\/.+$/];
+    const enhancedFetch = createBrowserLikeFetch({ trustedURLs, headers, hostname: 'safe-to-send.example.net' })(mockFetch);
+
+    enhancedFetch('https://safe-to-send.example.net/api/some-resource', {
+      credentials: 'same-origin',
+      headers: {
+        'Custom-Header': 'some header for this request',
+      },
+    });
+
+    expect(mockFetch).toHaveBeenCalledWith('https://safe-to-send.example.net/api/some-resource', {
+      credentials: 'same-origin',
+      headers: {
+        cookie: 'sessionid=123456',
+        'Custom-Header': 'some header for this request',
+      },
+    });
+  });
+
   it('sends un-duplicated cookies from headers and previous fetch responses to fetch requests', async () => {
     expect.assertions(4);
     const mockFetch = jest.fn(() => Promise.resolve({
@@ -374,6 +398,29 @@ describe('createCookiePassingFetch', () => {
 
     expect(mockFetch).toHaveBeenCalledWith('https://safe-to-send.example.com/api/some-resource', {
       credentials: 'omit',
+      headers: {
+        'Custom-Header': 'some header for this request',
+      },
+    });
+  });
+
+  it('does not send cookies from headers to fetch requests when credentials are set to `same-origin` but the host name is different', () => {
+    const mockFetch = jest.fn(() => Promise.resolve({}));
+    const headers = {
+      cookie: 'sessionid=123456',
+    };
+    const trustedURLs = [/^https:\/\/safe-to-send\.example\.com\/api\/.+$/];
+    const enhancedFetch = createBrowserLikeFetch({ trustedURLs, headers, hostname: 'not.the.same.origin.com' })(mockFetch);
+
+    enhancedFetch('https://safe-to-send.example.com/api/some-resource', {
+      credentials: 'same-origin',
+      headers: {
+        'Custom-Header': 'some header for this request',
+      },
+    });
+
+    expect(mockFetch).toHaveBeenCalledWith('https://safe-to-send.example.com/api/some-resource', {
+      credentials: 'same-origin',
       headers: {
         'Custom-Header': 'some header for this request',
       },
