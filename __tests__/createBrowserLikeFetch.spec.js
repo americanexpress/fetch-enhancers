@@ -212,7 +212,7 @@ describe('createCookiePassingFetch', () => {
   });
 
   it('sends cookies from headers to fetch requests when credentials are set to `same-origin`, and the origins match and URL is trusted', () => {
-    const mockFetch = jest.fn(() => Promise.resolve({}));
+    const mockFetch = jest.fn(() => Promise.resolve({ headers: new Headers() }));
     const headers = {
       cookie: 'sessionid=123456',
     };
