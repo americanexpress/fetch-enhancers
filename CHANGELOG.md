@@ -1,3 +1,11 @@
+## [1.1.3](https://github.com/americanexpress/fetch-enhancers/compare/v1.1.2...v1.1.3) (2022-11-07)
+
+
+### Bug Fixes
+
+* **commitlint:** fix husky commit msg ([#48](https://github.com/americanexpress/fetch-enhancers/issues/48)) ([f4bb4c9](https://github.com/americanexpress/fetch-enhancers/commit/f4bb4c96a32987879f2a950efb30b19e48b6190c))
+* **createBrowserLikeFetch:** dont send cookies if credentials=omit ([f3ba3d9](https://github.com/americanexpress/fetch-enhancers/commit/f3ba3d914dcebdd963eb1910ca5452d47c413086))
+
 ## [1.1.2](https://github.com/americanexpress/fetch-enhancers/compare/v1.1.1...v1.1.2) (2022-05-25)
 
 
