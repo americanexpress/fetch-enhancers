@@ -1,3 +1,10 @@
+## [1.1.4](https://github.com/americanexpress/fetch-enhancers/compare/v1.1.3...v1.1.4) (2023-01-27)
+
+
+### Bug Fixes
+
+* **dependency:** tough-cookie fails to allow cookies with domain of localhost ([#50](https://github.com/americanexpress/fetch-enhancers/issues/50)) ([5e36f15](https://github.com/americanexpress/fetch-enhancers/commit/5e36f15cd6e924a57a7de94de8437c94ace6f948))
+
 ## [1.1.3](https://github.com/americanexpress/fetch-enhancers/compare/v1.1.2...v1.1.3) (2022-11-07)
 
 
