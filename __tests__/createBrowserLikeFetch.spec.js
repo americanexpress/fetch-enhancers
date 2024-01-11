@@ -601,6 +601,30 @@ describe('createCookiePassingFetch', () => {
     });
   });
 
+  it('correctly calls setCookie when hostname is localhost', async () => {
+    const mockFetch = jest.fn(() => Promise.resolve({
+      headers: new Headers({
+        'set-cookie': [
+          'sessionid=123456; Secure; HttpOnly; domain=localhost; Max-Age=3600',
+        ],
+      }),
+    }));
+    const hostname = 'localhost';
+    const setCookie = jest.fn();
+    const fetchWithRequestHeaders = createBrowserLikeFetch({
+      hostname,
+      setCookie,
+    })(mockFetch);
+
+    await fetchWithRequestHeaders('https://localhost', {
+      credentials: 'include',
+    });
+
+    expect(setCookie.mock.calls[0][0]).toEqual('sessionid');
+    expect(setCookie.mock.calls[0][1]).toEqual('123456');
+    expect(setCookie.mock.calls[0][2].domain).toEqual('localhost');
+  });
+
   it('uses res.cookie to set cookie', async () => {
     const mockFetch = jest.fn(() => Promise.resolve({
       headers: new Headers({
