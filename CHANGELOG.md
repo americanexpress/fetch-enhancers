@@ -1,3 +1,10 @@
+## [1.1.5](https://github.com/americanexpress/fetch-enhancers/compare/v1.1.4...v1.1.5) (2024-01-16)
+
+
+### Bug Fixes
+
+* **createBrowserLikeFetch:** configure tough-cookie for localhost ([#57](https://github.com/americanexpress/fetch-enhancers/issues/57)) ([2b484e5](https://github.com/americanexpress/fetch-enhancers/commit/2b484e58ab3b88024775a714f41a311354d4c0a2))
+
 ## [1.1.4](https://github.com/americanexpress/fetch-enhancers/compare/v1.1.3...v1.1.4) (2023-01-27)
 
 
