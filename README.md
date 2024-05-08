@@ -1,15 +1,13 @@
 <h1 align="center">
+
+  [One App is now InnerSource](https://github.com/americanexpress/one-app/issues/1393)
+
+  <hr />
+  
   <img src='https://github.com/americanexpress/fetch-enhancers/blob/main/fetch-enhancers.png' alt="Fetch Enhancers - One Amex" width='50%'/>
 </h1>
 
 > A library of middleware for enhancing [Fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API).
-
-![Health Check](https://github.com/americanexpress/fetch-enhancers/workflows/Health%20Check/badge.svg)
-
-## 👩‍💻 Hiring 👨‍💻
-
-Want to get paid for your contributions to `@americanexpress/fetch-enhancers`?
-> Send your resume to oneamex.careers@aexp.com
 
 ## 📖 Table of Contents
 
@@ -18,7 +16,6 @@ Want to get paid for your contributions to `@americanexpress/fetch-enhancers`?
 
 ## 🤹‍ Usage
 
-- [👩‍💻 Hiring 👨‍💻](#-hiring-)
 - [📖 Table of Contents](#-table-of-contents)
 - [🤹‍ Usage](#-usage)
   - [Installation](#installation)
